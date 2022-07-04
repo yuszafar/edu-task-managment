@@ -29,7 +29,3 @@ class Base(models.Model):
 
     class Meta:
         abstract = True
-
-#TEST
-class Task(Base):
-    title = models.CharField(max_length=222)
