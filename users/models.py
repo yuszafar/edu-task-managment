@@ -8,7 +8,7 @@ class User(AbstractUser):
         ('Female', 'Female'),
     )
     gender = models.CharField(max_length=10, choices=gender_choice)
-    father_name = models.CharField(max_length=222, blank=True, null=True)
+    father_name = models.CharField(max_length=100, blank=True, null=True)
     image = models.ImageField(upload_to='user_images', blank=True, null=True)
     birthday = models.DateField(blank=True, null=True)
     phone = models.IntegerField(blank=True, null=True)
@@ -17,14 +17,14 @@ class User(AbstractUser):
 
 class Admin(Base, models.Model):
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin')
 
 
     def __str__(self):
         return self.user.username
 
 class Teacher(Base, models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='teacher')
 
     def __str__(self):
         return self.user.username
@@ -33,7 +33,7 @@ class Teacher(Base, models.Model):
 class Student(Base, models.Model):
 
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student')
 
 
     def __str__(self):
