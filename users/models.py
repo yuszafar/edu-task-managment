@@ -50,3 +50,6 @@ class StudentGroup(Base):
     description = models.TextField(blank=True, null=True)
     created_at = models.DateField(auto_now=True)
     status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
