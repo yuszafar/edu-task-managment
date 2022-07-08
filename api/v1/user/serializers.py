@@ -11,11 +11,11 @@ class StudentCreateSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source = 'user.last_name')
     email = serializers.CharField(source = 'user.email')
     phone = serializers.CharField(source = 'user.phone')
-    name = serializers.CharField(source = 'studentgroup.name')
+    group_id = serializers.IntegerField(source = 'studentgroup.id', label='id')
 
     class Meta:
         model = Student
-        fields = ('username', 'password', 'gender', 'birthday', 'first_name', 'last_name', 'email', 'phone','name')
+        fields = ('username', 'password', 'gender', 'birthday', 'first_name', 'last_name', 'email', 'phone','group_id')
 
     def create(self, validated_data):
         user = validated_data.pop('user')
@@ -27,7 +27,7 @@ class StudentCreateSerializer(serializers.ModelSerializer):
 
         student.user = users
         student.save()
-        group = StudentGroup.objects.filter(id = validated_data['studentgroup']['name'])[0]
+        group = StudentGroup.objects.filter(id = validated_data['studentgroup']['id'])[0]
         group.student.add(student.id)
         group.save()
         return student
