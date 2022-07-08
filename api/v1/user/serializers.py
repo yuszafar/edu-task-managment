@@ -19,10 +19,7 @@ class StudentCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = validated_data.pop('user')
-        users = User.objects.create(username=user['username'], first_name = user['first_name'],
-            email = user['email'], gender= user['gender'],   birthday = user['birthday'],
-            last_name = user['last_name'],  phone = user['phone']
-        )
+        users = User.objects.create(**user)
         users.set_password(user['password'])
         users.has_profile_true()
         users.save()
@@ -55,10 +52,10 @@ class StudentUpdateSerializer(serializers.ModelSerializer):
         #for User Update
         for attr, value in user.items():
             setattr(instance.user, attr, value)
+        instance.user.set_password(user['password'])
         #for Student Update
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-
         instance.user.save()
         instance.save()
 
@@ -100,15 +97,7 @@ class TeacherCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = validated_data.pop('user')
-        users = User.objects.create(
-            username = user['username'],
-            gender = user['gender'],
-            birthday = user['birthday'],
-            first_name = user['first_name'],
-            last_name = user['last_name'],
-            email = user['email'],
-            phone = user['phone'],
-            )
+        users = User.objects.create(**user)
         
         users.set_password(user['password'])
         users.has_profile_true()
@@ -125,10 +114,10 @@ class TeacherCreateSerializer(serializers.ModelSerializer):
         #for User Update
         for attr, value in user.items():
             setattr(instance.user, attr, value)
-        #for Teacher Update
+        instance.user.set_password(user['password'])
+        #for Student Update
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-
         instance.user.save()
         instance.save()
 
