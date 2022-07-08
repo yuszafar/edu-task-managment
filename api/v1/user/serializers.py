@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from user.models import User, Student, Teacher, Admin, StudentGroup
-
+import datetime
 class StudentCreateSerializer(serializers.ModelSerializer):
 
     username = serializers.CharField(source='user.username')
@@ -15,7 +15,7 @@ class StudentCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Student
-        fields = ('username', 'password', 'gender', 'birthday', 'first_name', 'last_name', 'email', 'phone','group_id')
+        fields = ('username', 'password', 'gender', 'birthday', 'first_name', 'last_name', 'email', 'phone','group_id', 'education_start_date')
 
     def create(self, validated_data):
         user = validated_data.pop('user')
@@ -24,7 +24,7 @@ class StudentCreateSerializer(serializers.ModelSerializer):
         users.has_profile_true()
         users.save()
         student = Student(**validated_data)
-
+        student.education_start_date = datetime.date.today()
         student.user = users
         student.save()
         group = StudentGroup.objects.filter(id = validated_data['studentgroup']['id'])[0]
@@ -104,7 +104,7 @@ class TeacherCreateSerializer(serializers.ModelSerializer):
         users.save()
 
         teacher = Teacher(**validated_data)
-        teacher.user = user
+        teacher.user = users
         teacher.save()
 
         return teacher
