@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from user.models import User, Student, Teacher, Admin, StudentGroup
-from rest_framework.response import Response
 
 class StudentCreateSerializer(serializers.ModelSerializer):
 
@@ -53,30 +52,16 @@ class StudentUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user = validated_data.pop('user')
-        if user.get('username'):
-            instance.user.username = user['username']
-            instance.user.save()
-        if user.get('password'):
-            instance.user.set_password(user['password'])
-            instance.user.save()
-        if user.get('gender'):
-            instance.user.gender = user['gender']
-            instance.user.save()
-        if user.get('birthday'):
-            instance.user.birthday = user['birthday']
-            instance.user.save()
-        if user.get('first_name'):
-            instance.user.firts_name = user['first_name']
-            instance.user.save()
-        if user.get('last_name'):
-            instance.user.last_name = user['last_name']
-            instance.user.save()
-        if user.get('email'):
-            instance.user.email = user['email']
-            instance.user.save()
-        if user.get('phone'):
-            instance.user.phone = user['phone']
-            instance.user.save()
+        #for User Update
+        for attr, value in user.items():
+            setattr(instance.user, attr, value)
+        #for Student Update
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.user.save()
+        instance.save()
+
         return instance
 
 
@@ -137,30 +122,17 @@ class TeacherCreateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user = validated_data.pop('user')
-        if user.get('username'):
-            instance.user.username = user['username']
-            instance.user.save()
-        if user.get('password'):
-            instance.user.set_password(user['password'])
-            instance.user.save()
-        if user.get('gender'):
-            instance.user.gender = user['gender']
-            instance.user.save()
-        if user.get('birthday'):
-            instance.user.birthday = user['birthday']
-            instance.user.save()
-        if user.get('first_name'):
-            instance.user.firts_name = user['first_name']
-            instance.user.save()
-        if user.get('last_name'):
-            instance.user.last_name = user['last_name']
-            instance.user.save()
-        if user.get('email'):
-            instance.user.email = user['email']
-            instance.user.save()
-        if user.get('phone'):
-            instance.user.phone = user['phone']
-            instance.user.save()
+        #for User Update
+        for attr, value in user.items():
+            setattr(instance.user, attr, value)
+        #for Teacher Update
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.user.save()
+        instance.save()
+
         return instance
+
 
 
