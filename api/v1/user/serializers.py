@@ -52,7 +52,8 @@ class StudentUpdateSerializer(serializers.ModelSerializer):
         #for User Update
         for attr, value in user.items():
             setattr(instance.user, attr, value)
-        instance.user.set_password(user['password'])
+        if user.get('password'):
+            instance.user.set_password(user['password'])
         #for Student Update
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -60,7 +61,6 @@ class StudentUpdateSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-
 
 
 
@@ -114,7 +114,8 @@ class TeacherCreateSerializer(serializers.ModelSerializer):
         #for User Update
         for attr, value in user.items():
             setattr(instance.user, attr, value)
-        instance.user.set_password(user['password'])
+        if user.get('password'):
+            instance.user.set_password(user['password'])
         #for Student Update
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
