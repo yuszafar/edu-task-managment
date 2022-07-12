@@ -1,8 +1,23 @@
 from rest_framework import serializers
 from user.models import User, Student, Teacher, Admin, StudentGroup
-import datetime
-class StudentCreateSerializer(serializers.ModelSerializer):
+from rest_framework import status
+from rest_framework.exceptions import APIException
+from rest_framework.exceptions import ValidationError
+from django.db import IntegrityError
 
+class ValidationError400(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+
+
+
+class StudentGroupListSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(label='id', read_only = True)
+    class Meta:
+        model = StudentGroup
+        fields = '__all__'
+
+
+class StudentCreateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
     password = serializers.CharField(write_only = True, source='user.password')
     gender = serializers.CharField(source = 'user.gender')
@@ -11,30 +26,36 @@ class StudentCreateSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source = 'user.last_name')
     email = serializers.CharField(source = 'user.email')
     phone = serializers.CharField(source = 'user.phone')
-
+    studentgroups = serializers.PrimaryKeyRelatedField(queryset=StudentGroup.objects.all(), many=True, write_only=True,)
     class Meta:
         model = Student
-        fields = ('username', 'password', 'gender', 'birthday', 'first_name', 'last_name', 'email', 'phone', 'education_start_date')
+        fields = ('username', 'password', 'gender', 'birthday', 'first_name', 'last_name', 'email', 'phone', 'education_start_date', 'studentgroups')
 
     def create(self, validated_data):
-        user = validated_data.pop('user')
-        users = User.objects.create(**user)
-        users.set_password(user['password'])
-        users.has_profile_true()
-        users.save()
+        try:
+            user = validated_data.pop('user')
+            users = User.objects.create(**user)
+            users.set_password(user['password'])
+            users.has_profile_true()
+            users.save()
+        except IntegrityError as e:
+            raise ValidationError(e)
 
+        groups = validated_data.pop('studentgroups', [])
         student = Student(**validated_data)
         student.user = users
         student.save()
 
-        if self.context["request"].POST.get('group_id'):
-            group = StudentGroup.objects.filter(id = self.context["request"].POST.get('group_id'))[0]
-            group.student.add(student.id)
-            group.save()
+        for obj in groups:
+            student.student_list_set = obj
+            student.student_list_set.student.add(student.id)
+
         return student
-        
+
+
     def update(self, instance, validated_data):
         user = validated_data.pop('user')
+        groups = validated_data.pop('studentgroups', [])
         #for User Update
         for attr, value in user.items():
             setattr(instance.user, attr, value)
@@ -64,10 +85,6 @@ class StudentGroupCreateSerializer(serializers.ModelSerializer):
         model = StudentGroup
         fields = ('name', 'owner', 'description', 'student')
 
-class StudentGroupListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = StudentGroup
-        fields = '__all__'
 
 class TeacherCreateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
