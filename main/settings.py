@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'base.apps.BaseConfig',
     'users.apps.UsersConfig',
     'user.apps.UserConfig',
+    'courses.apps.CoursesConfig',
     # third party apps
     'rest_framework',
 ]
