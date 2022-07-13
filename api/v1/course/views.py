@@ -1,9 +1,6 @@
 from .serializers import (
     CreateHomeworkSerializer,
-    CreateHomeworkStudentSerializer,
     SendHomeworkSerializer,
-    CreateHomeworkSerializer,
-    AnswerHomeworkStudentSerializer,
     )
 from rest_framework.generics import CreateAPIView
 from courses.models import (
