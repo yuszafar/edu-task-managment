@@ -25,34 +25,9 @@ class Homework(Base):
     homework_deadline_time = models.DateTimeField(null=True, validators=[deadline_time])
     teacher = models.ForeignKey(Teacher, on_delete=models.PROTECT, blank=True)
     student_group = models.ManyToManyField(StudentGroup)
-
+    student = models.ManyToManyField(Student, blank=True)
     def filename(self):
         return os.path.basename(self.homework_file.name)
-
-
-
-class HomeworkStudent(Base):
-    student = models.ForeignKey(Student, on_delete=models.PROTECT)
-    teacher = models.ForeignKey(Teacher, on_delete=models.PROTECT)
-    homework_title = models.CharField(max_length=255)
-    homework_text = models.TextField(blank=True)
-    homework_file = models.FileField(upload_to='homeworks/questions/student/')
-    homework_created_time = models.DateTimeField(auto_now_add=True)
-    homework_deadline_time = models.DateTimeField(null=True, validators=[deadline_time])
-
-
-
-
-class HomeworkAnswer(Base):
-    homework_task = models.ForeignKey(HomeworkStudent, on_delete=models.CASCADE)
-    student = models.ForeignKey(Student, on_delete=models.PROTECT)
-    upload_homework_time = models.DateTimeField(auto_now_add=True)
-    answer_file = models.FileField(upload_to='homeworks/answers/', blank=True,
-        validators=[FileExtensionValidator(allowed_extensions=["pdf", "doc", "docx", "ppt"])])
-    answer_rating = models.IntegerField(blank=True, validators=[MaxValueValidator(5), MinValueValidator(0)])
-
-    def filename(self):
-        return os.path.basename(self.answer_file.name)
 
 
 
