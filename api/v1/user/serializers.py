@@ -42,8 +42,7 @@ class StudentCreateSerializer(serializers.ModelSerializer):
         student.save()
 
         for obj in groups:
-            student.student_list_set = obj
-            student.student_list_set.student.add(student.id)
+            obj.student.add(student.id)
 
         return student
 
