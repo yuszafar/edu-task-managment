@@ -1,5 +1,3 @@
-
-from urllib import request
 from .serializers import *
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -8,14 +6,29 @@ from rest_framework.response import Response
 from rest_framework import status
 
 class StudentCreate(generics.CreateAPIView):
-    queryset = StudentGroup.objects.all()
+    queryset = Student.objects.all()
     serializer_class = StudentCreateSerializer
+
+
+class StudentUpdate(generics.UpdateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentCreateSerializer
+
+
+
 
 class StudentGroupCreate(generics.CreateAPIView):
     queryset = StudentGroup.objects.all()
     serializer_class = StudentGroupCreateSerializer
 
+
+
 class TeacherCreate(generics.CreateAPIView):
+    queryset = Teacher.objects.all()
+    serializer_class = TeacherCreateSerializer
+
+
+class TeacherUpdate(generics.RetrieveUpdateDestroyAPIView):
     queryset = Teacher.objects.all()
     serializer_class = TeacherCreateSerializer
 
@@ -25,23 +38,13 @@ class StudentList(generics.ListAPIView):
     serializer_class = StudentListSerializer
 
 
+
+
 class StudentGroupList(generics.ListAPIView):
+    queryset = StudentGroup.objects.all()
     serializer_class = StudentGroupListSerializer
 
-    def get_queryset(self):
 
-        if self.request.user.id:
-            owner = self.request.user.id
-            return StudentGroup.objects.filter(owner = owner)
-        
-        else:
-            return StudentGroup.objects.all()
-
-
-class StudentGroupDetailList(APIView):
-
-    def get(self, request, pk):
-
-        group = StudentGroup.objects.filter(id = pk)
-        serializer = StudentGroupListSerializer(group, many=True)
-        return Response(serializer.data)
+class StudentGroupDetailList(generics.RetrieveAPIView):
+    queryset = StudentGroup.objects.all()
+    serializer_class = StudentGroupListSerializer

@@ -1,9 +1,21 @@
 from rest_framework import serializers
 from users.models import User, Student, Teacher, Admin, StudentGroup
-from rest_framework.response import Response
+from rest_framework.validators import UniqueValidator
+
+class StudentGroupCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentGroup
+        fields = ('name', 'owner', 'description', 'student', )
+
+class StudentGroupListSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(label='id', read_only = True)
+    class Meta:
+        model = StudentGroup
+        fields = '__all__'
+
 
 class StudentCreateSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username')
+    username = serializers.CharField(source='user.username', validators =[UniqueValidator(queryset=User.objects.all())] )
     password = serializers.CharField(write_only = True, source='user.password')
     gender = serializers.CharField(source = 'user.gender')
     birthday = serializers.DateField(source = 'user.birthday')
@@ -11,28 +23,46 @@ class StudentCreateSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source = 'user.last_name')
     email = serializers.CharField(source = 'user.email')
     phone = serializers.CharField(source = 'user.phone')
-    name = serializers.CharField(source = 'studentgroup.name')
+    studentgroups = serializers.PrimaryKeyRelatedField(queryset=StudentGroup.objects.all(), many=True, write_only=True,)
     class Meta:
-        model = StudentGroup
-        fields = ('username', 'password', 'gender', 'birthday', 'first_name', 'last_name', 'email', 'phone','name')
+        model = Student
+        fields = ('username', 'password', 'gender', 'birthday', 'first_name', 'last_name', 'email', 'phone', 'education_start_date', 'studentgroups')
 
     def create(self, validated_data):
+
         user = validated_data.pop('user')
-        users = User.objects.create(username=user['username'], first_name = user['first_name'],
-            email = user['email'], gender= user['gender'],   birthday = user['birthday'],
-            last_name = user['last_name'],  phone = user['phone']
-        )
+        users = User.objects.create(**user)
         users.set_password(user['password'])
         users.has_profile_true()
         users.save()
-        student = Student(**validated_data)
 
+        groups = validated_data.pop('studentgroups', [])
+        student = Student(**validated_data)
         student.user = users
         student.save()
-        group = StudentGroup.objects.filter(id = validated_data['studentgroup']['name'])[0]
-        group.student.add(student.id)
-        group.save()
+
+        for obj in groups:
+            obj.student.add(student.id)
+
         return student
+
+
+    def update(self, instance, validated_data):
+        user = validated_data.pop('user')
+        new_groups = validated_data.pop('studentgroups', [])
+        #for User Update
+        for attr, value in user.items():
+            setattr(instance.user, attr, value)
+        if user.get('password'):
+            instance.user.set_password(user['password'])
+        #for Student Update
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.user.save()
+        instance.save()
+        return instance
+
+
 class StudentListSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -42,7 +72,7 @@ class StudentListSerializer(serializers.ModelSerializer):
 class StudentGroupCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentGroup
-        fields = ('name', 'owner', 'description', 'student')
+        fields = ('name', 'owner', 'description', 'student',)
 
 class StudentGroupListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,26 +91,34 @@ class TeacherCreateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Teacher
-        fields = ('username', 'password', 'gender', 'birthday', 'first_name', 'last_name', 'email', 'phone')
+        fields = ('username', 'password', 'gender', 'birthday', 'first_name', 'last_name', 'email', 'phone', 'position')
 
     def create(self, validated_data):
         user = validated_data.pop('user')
-        user = User.objects.create(
-            username = user['username'],
-            gender = user['gender'],
-            birthday = user['birthday'],
-            first_name = user['first_name'],
-            last_name = user['last_name'],
-            email = user['email'],
-            phone = user['phone'],
-            )
+        users = User.objects.create(**user)
         
-        user.set_password('password')
-        user.has_profile_true()
-        user.save()
+        users.set_password(user['password'])
+        users.has_profile_true()
+        users.save()
 
         teacher = Teacher(**validated_data)
-        teacher.user = user
+        
+        teacher.user = users
         teacher.save()
 
         return teacher
+
+    def update(self, instance, validated_data):
+        user = validated_data.pop('user')
+        #for User Update
+        for attr, value in user.items():
+            setattr(instance.user, attr, value)
+        if user.get('password'):
+            instance.user.set_password(user['password'])
+        #for Student Update
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.user.save()
+        instance.save()
+
+        return instance

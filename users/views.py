@@ -21,3 +21,23 @@ def studentList(request, pk):
         'pk':pk
     }
     return render(request, 'users/student/studentList.html', context)
+
+def teacherList(request):
+    teachers = Teacher.objects.all()
+    context = {
+        'teachers':teachers,
+    }
+    return render(request, 'users/teacher/teacherList.html', context)
+
+def groups(request):
+    groups = StudentGroup.objects.all()
+    context = {
+        'groups':groups
+    }
+    return render(request, 'users/student/groups.html', context)
+
+def tasks(request):
+    return render(request, 'users/student/task.html')
+
+def hometask(request):
+    return render(request, 'hometasks/hometask.html')
