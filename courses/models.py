@@ -35,8 +35,7 @@ class HomeworkSubmission(Base):
     homework = models.ForeignKey(Homework, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.PROTECT)
     upload_homework_time = models.DateTimeField(auto_now_add=True)
-    submission_homework_file = models.FileField(upload_to='homeworks/answers/', blank=True, 
-        validators=[FileExtensionValidator(allowed_extensions=["pdf", "doc", "docx", "ppt"])])
+    submission_homework_file = models.FileField(upload_to='homeworks/answers/', blank=True)
     submission_rating = models.IntegerField(blank=True, validators=[MaxValueValidator(5), MinValueValidator(0)])
 
     def filename(self):
