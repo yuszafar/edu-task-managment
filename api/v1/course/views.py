@@ -1,14 +1,13 @@
 from .serializers import (
     CreateHomeworkSerializer,
     SendHomeworkSerializer,
+    SubmissionHomeworkList
     )
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, ListCreateAPIView
 from courses.models import (
     Homework, 
     HomeworkSubmission,
     )
-from rest_framework.views import APIView
-from rest_framework.response import Response
 
 
 class CreateHomework(CreateAPIView):
@@ -24,4 +23,13 @@ class SendHomework(CreateAPIView):
     serializer_class = SendHomeworkSerializer
 
     def perform_create(self, serializer):
-        serializer.save(student = self.request.user.student)
+        serializer.save(student = self.request.user.student, is_answered = True)
+
+
+
+class HomeworkSubmissions(ListAPIView):
+    serializer_class = SubmissionHomeworkList
+    def get_queryset(self):
+        if self.kwargs["pk"]:
+            submissions = HomeworkSubmission.objects.filter(homework = self.kwargs["pk"])
+            return submissions

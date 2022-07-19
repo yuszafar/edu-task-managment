@@ -1,16 +1,16 @@
 from .serializers import *
 from rest_framework import generics
-from rest_framework.views import APIView
 from user.models import *
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+
 
 class StudentCreate(generics.CreateAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentCreateSerializer
+    permission_classes = [IsAuthenticated]
+    
 
-
-class StudentUpdate(generics.RetrieveUpdateDestroyAPIView):
+class StudentUpdate(generics.UpdateAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentCreateSerializer
 
@@ -20,12 +20,14 @@ class StudentUpdate(generics.RetrieveUpdateDestroyAPIView):
 class StudentGroupCreate(generics.CreateAPIView):
     queryset = StudentGroup.objects.all()
     serializer_class = StudentGroupCreateSerializer
+    permission_classes = [IsAuthenticated]
 
 
 
 class TeacherCreate(generics.CreateAPIView):
     queryset = Teacher.objects.all()
     serializer_class = TeacherCreateSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class TeacherUpdate(generics.RetrieveUpdateDestroyAPIView):
@@ -48,3 +50,12 @@ class StudentGroupList(generics.ListAPIView):
 class StudentGroupDetailList(generics.RetrieveAPIView):
     queryset = StudentGroup.objects.all()
     serializer_class = StudentGroupListSerializer
+
+class AdminCreate(generics.CreateAPIView):
+    queryset = Admin.objects.all()
+    serializer_class = AdminCreateSerializer
+    permission_classes = [IsAuthenticated]
+
+class AdminUpdate(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Admin.objects.all()
+    serializer_class = AdminCreateSerializer

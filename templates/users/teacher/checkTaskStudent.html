@@ -1,0 +1,120 @@
+{% extends '../../base.html' %}
+
+{% block content %}
+{% if request.user.teacher %}
+<div class="content">
+        <div class="card">
+            <div class="card-header">
+                <h2>Student Submissions</h2>
+            </div>
+            <table class="table datatable-basic table-hover">
+                <thead>
+                    <tr>
+                        <th>Выбрать</th>
+                        <th>Название Задачи</th>
+                        <th>Предмет</th>
+                        <th>Время Создания Задачи</th>
+                        <th>Срок</th>
+                        <th>Файл Задачи</th>
+                    </tr>
+                </thead>
+                <div class="card-body">
+                    <tbody>
+                    {% for el in Homework %}
+                        <tr>
+                            <td><input type="checkbox" name="" id=""></td>
+                            <td>{{ el.homework_title }}</td>
+                            <td><a type="button" data-id="{{ el.id }}" id="overlay"  data-toggle="modal" data-target="#modal_full">{{ request.user.teacher.position }}</a></td>
+                            <td>{{ el.homework_created_time }}</td>
+                            <td>{{ el.homework_deadline_time }}</td>
+                            <td><a href="{{ el.homework_file.url }}">Homework File</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </div>
+            </table>
+        </div>
+    </div>
+    <!-- Full width modal -->
+    <div id="modal_full" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-full">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Hover rows -->
+                    <div class="card">
+                        <div class="card-header header-elements-inline">
+                            <h5 class="card-title">Submissions</h5>
+                            <div class="header-elements">
+                                <div class="list-icons">
+                                    <a class="list-icons-item" data-action="collapse"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <table id="example" class="table datatable-basic table-hover" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Имя пользователя</th>
+                                    <th>Имя</th>
+                                    <th>Фамилия</th>
+                                    <th>Время Создания Ответа</th>
+                                    <th>Файл Ответов</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <!-- /hover rows -->
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                    <button type="button"  class="btn bg-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /full width modal -->
+    <script>
+
+        let objects = document.querySelectorAll('#overlay')
+        for (let item of objects){
+		   item.addEventListener('click', function() {
+			   get_submissions(item.dataset.id)
+               console.log(item.dataset.id)
+		   })
+	   }
+       function get_submissions(homework_id){
+        var tablets = document.getElementById('tablets')
+            fetch('/api/v1/course/submissions/list/' + homework_id + '/', {
+                method: 'GET',
+            }).then(response => {
+                return response.json();
+            }).then(data =>{
+                console.log(data)
+                $(document).ready(function () {
+                    $('#example').DataTable({
+                        "bDestroy": true,
+                        ajax: {
+                            url: '/api/v1/course/submissions/list/' + homework_id + '/',
+                            dataSrc: '',
+                        },
+                        columns: [
+                            {data: 'student.user.username'},
+                            {data: 'student.user.first_name'},
+                            {data: 'student.user.last_name'},
+                            {data: 'upload_homework_time', render: function(date){ return moment(date).locale('uz').format('lll') }},
+                            {data: 'submission_homework_file', render: function (file) { return '<a href="' + file + '" target="_blank">Download File</a>'; }},
+                            {data: 'is_answered'},
+                        ]
+                    });
+                });
+            }
+            )
+       }
+    </script>
+{% endif %}
+{% endblock content %}
