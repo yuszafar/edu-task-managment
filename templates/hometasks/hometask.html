@@ -20,17 +20,35 @@
                     <input type="file" class="form-input-styled" id="file" data-fouc>
                 </div>
                 <div class="form-group">
-                    <label>Срок</label>
-                    <input class="form-control daterange-time" type="date" id="datetime" name="date">
+                    <label>Срок:</label>
+                    <div class="input-group">
+                        <span class="input-group-prepend">
+                            <span class="input-group-text"><i class="icon-calendar22"></i></span>
+                        </span>
+                        <input id="datetime" type="datetime-local" class="form-control">
+                    </div>
                 </div>
                 <div class="form-group ">
                     <label>Выберите группы</label>
-                        <select multiple="multiple" class="form-control" id="groups" >
+                        <select class="form-control" id="groups" >
+                            <option value="Выберите Группу">Выберите Группу</option>
                             {% for groups in list_groups %}
                             <option value="{{ groups.id }}">{{ groups.name }}</option>
                             {% endfor %}
                         </select>
                     </label>
+                </div>
+                <div class="form-group">
+                    <label>Выберите учиника</label>
+                    <div class="col-lg-10">
+                        <select class="form-control" id="students" multiple="multiple">
+                            {% for groups in list_groups %}
+                                {% for students in groups.student.all %}
+                                    <option id="{{ groups.id }}" selected value="{{ students.id }}">{{ students }}</option>
+                                {% endfor %}
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 <div class="alert alert-danger border-0 alert-dismissible" id="error" style="display: None;">
                     <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
@@ -43,23 +61,36 @@
         </div>
     </div>
     <script>
+   $(document).ready(function()
+   {
+    $groups=$('#groups'),
+    $students=$('#students'),
+    $options=$students.find('option');
+    $groups.on('change', function()
+    {
+        $students.html($options.filter('[id="'+this.value+'"]'));
+    }).trigger('change');
+   });
+    </script>
+    <script>
         $('#submit').on('click', function(){
             let input = document.getElementById('file');
             let crf_token = $('[name="csrfmiddlewaretoken"]').attr('value');
             let homework_title = $('#name').val();
             let homework_text = $('#description').val();
-            let homework_deadline_time = $('#date').val();
-            let groups = $('#groups').val()
+            let group = $('#groups').val()
             let datetime = $('#datetime').val()
+            let students = $('#students').val()
             let data = new FormData();
+            for (var i=0; i < students.length; i++){
+                data.append('student', students[i])
+            }
             data.append('homework_file', input.files[0]);
             data.append('homework_title', homework_title);
             data.append('homework_text', homework_text);
             data.append('csrfmiddlewaretoken', crf_token);
             data.append('homework_deadline_time', datetime);
-            for (var i = 0; i < groups.length; i++) {
-                data.append('student_group', groups[i]);
-            }
+            data.append('student_group', group)
             
             fetch('/api/v1/course/homework/create/', {
                 method: 'POST',
@@ -79,14 +110,6 @@
 		    }
         )}
         );
-    </script>
-    <script>
-        $(function () {
-          $('#datetime').datetimepicker({
-              inline: true,
-              sideBySide: true
-          });
-      });
     </script>
     {% endif %}
 {% endblock content %}

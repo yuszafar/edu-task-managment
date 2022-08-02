@@ -25,26 +25,26 @@
 					<table class="table datatable-basic">
 						<thead>
 							<tr>
+								<th>№</th>
 								<th>Имя пользователя</th>
 								<th>Имя</th>
 								<th>Фамилия</th>
 								<th>День рождения</th>
 								<th>Email</th>
 								<th>Телефон</th>
-								<th>Mark</th>
 							</tr>
 						</thead>
 						<tbody>
 						{% for el in student %}
 							{% for i in el.student.all %}
 							<tr>
+								<td>{{ forloop.counter }}</td>
 								<td>{{ i.user.username }}</td>
 								<td>{{ i.user.first_name }}</td>
 								<td>{{ i.user.last_name}}</td>
 								<td>{{ i.user.birthday }}</td>
 								<td>{{ i.user.email }}</td>
 								<td>{{ i.user.phone }}</td>
-								<td>5</td>
 							</tr>
 							{% endfor %}
 						{% endfor %}

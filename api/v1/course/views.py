@@ -1,9 +1,10 @@
 from .serializers import (
     CreateHomeworkSerializer,
     SendHomeworkSerializer,
-    SubmissionHomeworkList
+    SubmissionHomeworkList,
+    AnswerHomeworkRating
     )
-from rest_framework.generics import CreateAPIView, ListAPIView, ListCreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from courses.models import (
     Homework, 
     HomeworkSubmission,
@@ -33,3 +34,8 @@ class HomeworkSubmissions(ListAPIView):
         if self.kwargs["pk"]:
             submissions = HomeworkSubmission.objects.filter(homework = self.kwargs["pk"])
             return submissions
+
+
+class CreateRatingAnswerHomework(CreateAPIView):
+    serializer_class = AnswerHomeworkRating
+    queryset = HomeworkSubmission.objects.all()

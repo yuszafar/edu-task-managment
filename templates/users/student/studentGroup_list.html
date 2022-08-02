@@ -22,11 +22,11 @@
 					<table class="table datatable-basic">
 						<thead>
 							<tr>
+								<th>№</th>
 								<th>Имя</th>
 								<th>Владелец</th>
 								<th>Описание</th>
 								<th>Дата создания</th>
-								<th>Статус</th>
 								<th>Count</th>
 								
 							</tr>
@@ -34,11 +34,11 @@
 						<tbody>
 							{% for i in groups %}
 								<tr>
+									<td>{{ forloop.counter }}</td>
 									<td><a href="{% url 'students' i.pk %}">{{ i.name }}</a></td>
 									<td>{{ i.owner.user.username }}</td>
 									<td>{{ i.description }}</td>
 									<td>{{ i.created_at }}</td>
-									<td>{% if i.status == True %} active {% else %} deactive {% endif %}</td>
 									<td>
 									{{ i.student.count }}
 									</td>

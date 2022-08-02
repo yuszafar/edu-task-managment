@@ -14,12 +14,6 @@
                 </span>
                 <a href="{{ el.homework_file.url }}" download class="h5">Скачивать файл</a>
                 <p class="h4 mt-2">Срок: <time>{{ el.homework_deadline_time }}</time> </p>
-                {% for i in homeworksubmission %}
-                    {% if i.homework.id == el.id %}
-                        <p class="h4 mt-2" id="answers">Отправленный<i class="icon-checkmark3 ml-3 text-success"></i></p>
-                    {% endif %}
-                {% endfor %}
-                
             </div>
             <div class="card-body">
                 <!-- Button trigger modal -->

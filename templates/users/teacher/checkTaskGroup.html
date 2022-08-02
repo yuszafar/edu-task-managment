@@ -8,11 +8,11 @@
                 <h2>Given Task </h2>
             </div>
             <div class="card-body">
-                <table class="table datatable-basic">
+                <table class="table datatable-basic table-hover">
                     <thead>
                         <tr>
                             <th>Group</th>
-                            <th>Teacher</th>
+                            <th>Owner</th>
                             <th>Created Date</th>
                             <th>Student</th>
                             <th>Answers</th>
@@ -28,6 +28,7 @@
                             <td>{{ el.student.count }}</td>
                             <td>15</td>
                             <td>Active</td>
+                        </tr>
                     {% endfor %}
                     </tbody>
                 </table>

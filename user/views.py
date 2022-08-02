@@ -1,11 +1,12 @@
-from django.shortcuts import render
+from urllib import request
 from courses.models import Homework
 from .models import *
 from django.contrib.auth.views import LogoutView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import View
 from django.views.generic import ListView, DetailView
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 # Create your views here.
 
 
@@ -32,11 +33,7 @@ class AdminProfile(LoginRequiredMixin, ListView):
 
 
 
-class Dashboard(LoginRequiredMixin, View):
-    login_url = "login"
-    def get(self, request):
-    
-        return render(request, 'index.html')
+
 
 
 class Groups(LoginRequiredMixin, ListView):
@@ -44,7 +41,12 @@ class Groups(LoginRequiredMixin, ListView):
     context_object_name = "groups"
     model = StudentGroup
     template_name: str = 'users/student/studentGroup_list.html'
-        
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['students'] = Student.objects.filter(student_list__isnull = True)
+
+        return context
 
 class DetailGroup(LoginRequiredMixin, DetailView):
     login_url = "login"
@@ -71,8 +73,8 @@ class StudentGroups(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         try:
             context['groups'] = StudentGroup.objects.filter(student = self.request.user.student.id)
-            context['homeworks'] = Homework.objects.filter(student_group__in = context['groups'])
-                
+            context['homeworks'] = Homework.objects.filter(student = self.request.user.student).exclude(homeworks__student = self.request.user.student)
             return context
-        except:
+        except ObjectDoesNotExist:
             return {"msg":"error"}
+

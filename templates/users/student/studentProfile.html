@@ -1,7 +1,8 @@
 {% extends '../../base.html' %}
 
 {% block content %}
-<div class="content">
+	<div class="content">
+		<div class="content-wrapper">
 			<div class="card">
 				<div class="card-header header-elements-inline">
 					<h5 class="card-title">Profile information</h5>
@@ -17,10 +18,6 @@
 				<div class="card-body">
 					<form method="PATCH">{% csrf_token %}
 						<div class="form-group">
-							<div class="alert alert-success border-0 alert-dismissible" style="display: none;" id="success">
-								<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-								<span class="font-weight-semibold">Well done!</span> Your profile update
-							</div>
 							<div class="row">
 								<div class="col-md-6">
 									<label>Username</label>
@@ -52,9 +49,13 @@
 								</div>
 								<div class="col-md-6">
 									<label>Your Gender</label>
-									<select class="form-control form-control-select2" id="gender" data-fouc>
-										<option value="germany" selected>{{ request.user.gender }}</option> 
-										<option value="france">Female</option>  
+									<select class="form-control" id="gender">
+										<option value="{{ request.user.gender }}" selected>{{ request.user.gender }}</option> 
+										{% if request.user.gender != "Female" %}
+										<option value="Female">Female</option>  
+										{% else %}
+										<option value="Male">Male</option> 
+										{% endif %}
 									</select>
 								</div>
 							</div>
@@ -87,7 +88,7 @@
 							</div>
 						</div>
 						<div class="text-right">
-							<button type="button" class="btn btn-primary" id="submit">Сохранить</button>
+							<button type="button" class="btn btn-primary m-3" id="pnotify-profile-success">Сохранить</button>
 						</div>
 					</form>
 				</div>
@@ -109,51 +110,37 @@
 				</div>
 
 				<div class="card-body">
-					<form action="#">
+					<form method="PATCH">{% csrf_token %}
+						<div class="form-check">
+							<label class="form-check-label">
+								<input type="checkbox" onclick="checkboxBtn()" id="check" class="form-check-input">
+								<span class="form-check-sign" id="checkText">Изменение пароля</span>
+							</label>
+						</div>
 						<div class="form-group">
 							<div class="row">
+
 								<div class="col-md-6">
-									<label>Username</label>
-									<input type="text" value="{{ request.user.username }}" readonly="readonly" class="form-control">
+									<label>Новый пароль</label>
+									<input type="password" value="" readonly="readonly" class="form-control" id="passwordBtn" placeholder="Новый пароль">
 								</div>
 
 								<div class="col-md-6">
-									<label>Current password</label>
-									<input type="password" value="" readonly="readonly" class="form-control">
+									<label>Подвержение пароля</label>
+									<input type="password" value="" readonly="readonly" class="form-control" id="passwordBtn2" placeholder="Новый пароль">
 								</div>
 							</div>
 						</div>
-
-						<div class="form-group">
-							<div class="row">
-								<div class="col-md-6">
-									<label>New password</label>
-									<input type="password" placeholder="Enter new password" class="form-control">
-								</div>
-
-								<div class="col-md-6">
-									<label>Repeat New password</label>
-									<input type="password" placeholder="Repeat new password" class="form-control">
-								</div>
-							</div>
-						</div>
-
-						
-
 						<div class="text-right">
-							<button type="submit" class="btn btn-primary">Save changes</button>
+							<button type="button" class="btn btn-primary m-3" id="change">Сохранить</button>
 						</div>
 					</form>
 				</div>
 			</div>
 			<!-- /account settings -->
-
 		</div>
-	</div>
-	<!-- /left content -->
-</div>
 <script>
-	$('#submit').on('click', function(){
+	$('#pnotify-profile-success').on('click', function(){
 		var first_name = $('#first_name').val()
 		var last_name = $('#last_name').val()
 		var father_name = $('#father_name').val()
@@ -174,9 +161,45 @@
 				xhr.setRequestHeader("X-CSRFToken", csrftoken);
 			},
 			success: function(data){
-				document.getElementById('success').style.display='block'
+
 			}
 		})
 	});
+</script>
+<script>
+	// checkboxBtn
+	function checkboxBtn(){
+		if(document.getElementById("check").checked){
+			document.getElementById("passwordBtn2").readOnly = false;
+			document.getElementById("passwordBtn").readOnly = false;
+			$('#change').on('click', function(){
+				passwordBtn2 = $('#passwordBtn2').val()
+				password = $('#passwordBtn').val()
+				if (passwordBtn2 == password){
+					$.ajax({
+						type:'PATCH',
+						url: "/api/v1/user/student/update/{{ request.user.student.id }}/",
+						data:JSON.stringify( {
+							password:password,
+							csrfmiddlewaretoken: csrftoken
+						}),
+						contentType: "application/json; charset=utf-8",
+						dataType: "json",
+						beforeSend: function (xhr) {
+							xhr.setRequestHeader("X-CSRFToken", csrftoken);
+						},
+						success: function(data){
+							window.location = '/user/student/profile';
+						}
+					})
+				}
+				});
+				
+		}
+		else{
+			document.getElementById("passwordBtn2").readOnly = true;
+			document.getElementById("passwordBtn").readOnly=true;
+		}
+  }
 </script>
 {% endblock content %}				

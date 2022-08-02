@@ -34,10 +34,8 @@
 												<div class="form-group">
 													<label>Выберите Студентов</label>
 														<select multiple="multiple" class="form-control" id="student">
-														{% for el in groups %}
-														{% for i in el.student.all %}
-															<option value="{{ i.id }}">{{ i }}</option>   
-														{% endfor %}   
+														{% for i in students %}
+															<option value="{{ i.id }}">{{ i.user }}</option>   
 														{% endfor %}
 														</select>
 												</div>

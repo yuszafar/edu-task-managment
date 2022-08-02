@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from users.models import User, Student, Teacher, Admin, StudentGroup
+from user.models import User, Student, Teacher, Admin, StudentGroup
 from rest_framework.validators import UniqueValidator
+
 
 class UserListSerializers(serializers.ModelSerializer):
     class Meta:
@@ -182,3 +183,13 @@ class AdminCreateSerializer(serializers.ModelSerializer):
         return instance
 
 
+class TeacherListSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only = True)
+    class Meta:
+        model = Teacher
+        fields = '__all__'
+    def get_user(self, obj):
+        id = obj.user
+        serializer_userId = UserListSerializers(id, many=False)
+
+        return serializer_userId.data

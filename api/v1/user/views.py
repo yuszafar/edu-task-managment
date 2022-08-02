@@ -59,3 +59,7 @@ class AdminCreate(generics.CreateAPIView):
 class AdminUpdate(generics.RetrieveUpdateDestroyAPIView):
     queryset = Admin.objects.all()
     serializer_class = AdminCreateSerializer
+
+
+
+        
