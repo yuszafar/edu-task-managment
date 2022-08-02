@@ -27,5 +27,6 @@ class Base(models.Model):
         self.is_deleted = False
         self.save()
 
+
     class Meta:
         abstract = True
